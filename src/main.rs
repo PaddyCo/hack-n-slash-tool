@@ -12,7 +12,7 @@ mod data;
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Args {
-    /// Number of times to greet
+    /// The path to the HnS user file
     #[arg()]
     user_file_path: PathBuf,
 }
@@ -43,7 +43,8 @@ fn main() -> Result<(), Box<dyn Error>> {
             Err(_) => break,
         }
     }
-    if (users.len() == 0) {
+
+    if users.len() == 0 {
         panic!("No users could be parsed!");
     }
 
