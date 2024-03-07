@@ -71,6 +71,9 @@ struct User {
     charisma: u8,
     weapon: Weapon,
     armor: Armor,
+    joust_wins: u16,
+    joust_loss: u16,
+    joust_ratio: Option<f32>,
 }
 
 const BASE_EXP: f64 = 1100.0;
@@ -137,6 +140,8 @@ fn parse_user(reader: &mut BufReader<File>) -> Result<ParseUserResult, Box<dyn E
     let charisma = data_buf[0x98];
     let weapon = Weapon::from_u8(&data_buf[0x9b]);
     let armor = Armor::from_u8(&data_buf[0x9c]);
+    let joust_wins = u16::from_be_bytes([data_buf[0xb4], data_buf[0xb5]]);
+    let joust_loss = u16::from_be_bytes([data_buf[0xb6], data_buf[0xb7]]);
 
     let user = User {
         handle: handle.trim_matches(char::from(0)).to_string(),
@@ -158,6 +163,12 @@ fn parse_user(reader: &mut BufReader<File>) -> Result<ParseUserResult, Box<dyn E
         loan,
         weapon,
         armor,
+        joust_wins,
+        joust_loss,
+        joust_ratio: match joust_wins + joust_loss > 0 {
+            true => Some((joust_wins as f32) / (joust_wins as f32 + joust_loss as f32)),
+            false => None,
+        },
     };
 
     Ok(ParseUserResult::User(user))
